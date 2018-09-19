@@ -5,3 +5,10 @@ C:\Users\M0107\Documents\Repos\SW7\WI\NearDubDetect\NearDubDetect\NearDubDetect\
 C:\Users\M0107\Documents\Repos\SW7\WI\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.csproj.CoreCompileInputs.cache
 C:\Users\M0107\Documents\Repos\SW7\WI\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.exe
 C:\Users\M0107\Documents\Repos\SW7\WI\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.pdb
+C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\NearDubDetect.exe.config
+C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\NearDubDetect.exe
+C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\NearDubDetect.pdb
+C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.csprojAssemblyReference.cache
+C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.csproj.CoreCompileInputs.cache
+C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.exe
+C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.pdb

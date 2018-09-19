@@ -10,6 +10,7 @@ namespace NearDubDetect
     {
         static void Main(string[] args)
         {
+            /*
             string et = "<h2>Contrary to popular belief, Lorem Ipsum is not simply random text.</h1> It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.";
             string to = "Contrary test to popular belief, test Lorem psum is simply dummy text of the p Ipsum is not simply random text. It test has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.";
             string tre = "polse polse polse polse polse";
@@ -22,7 +23,27 @@ namespace NearDubDetect
             NearDubDetector tester = new NearDubDetector();
 
             System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
+            //System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
+            //System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
+            //System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
+            //System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
+            */
+
             
+            RobotTXTHandler RTHandler = new RobotTXTHandler();
+            Restriction a = RTHandler.FindRestrictions("https://www.twitch.tv/robots.txt");
+
+            Console.WriteLine("Allow: ");
+            foreach (string item in a.allow)
+            {
+                System.Console.WriteLine(item);
+            }
+            Console.WriteLine("Disallow: ");
+            foreach (string item in a.disallow)
+            {
+                System.Console.WriteLine(item);
+            }
+
             System.Console.ReadLine(); 
 
             /*
