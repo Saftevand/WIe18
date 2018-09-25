@@ -12,6 +12,7 @@ namespace NearDubDetect
     class Crawler
     {
         RobotTXTHandler RobotTXTHandler = new RobotTXTHandler();
+        NearDubDetector NearDubDetector = new NearDubDetector();
         private string _seedURL;
         private List<Domain> domains = new List<Domain>();
         private Queue<Website> queue = new Queue<Website>();
@@ -35,7 +36,14 @@ namespace NearDubDetect
                 if (queue.Count > 0)
                 {
                     _website = queue.Dequeue();
-                    websites.Add(_website);
+
+                    foreach (Website item in websites)
+                    {
+                        if(NearDubDetector.Jaccard(item.HTMLContent, _website.HTMLContent) < 80)
+                        {
+                            websites.Add(_website);
+                        }
+                    }
                     processNewPage(_website.currentPath);
                 }
                 else break;
