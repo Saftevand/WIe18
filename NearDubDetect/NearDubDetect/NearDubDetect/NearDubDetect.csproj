@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crawler.cs" />
+    <Compile Include="Domain.cs" />
     <Compile Include="HtmlRemoval.cs" />
     <Compile Include="NearDubDetector.cs" />
     <Compile Include="Program.cs" />

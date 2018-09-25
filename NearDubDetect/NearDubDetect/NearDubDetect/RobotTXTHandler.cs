@@ -8,50 +8,52 @@ using System.Net;
 namespace NearDubDetect
 {
     class RobotTXTHandler
-    {
-        public RobotTXTHandler()
-        {
-
-        }
+    {       
 
         public Restriction FindRestrictions(string website)
         {
+
+            Restriction restrictions = new Restriction();
+            string webData = "";
             bool scope = false;
             WebClient wc = new WebClient();
-            byte[] raw = wc.DownloadData(website);
+            try
+            {
+                byte[] raw = wc.DownloadData(website + "/robots.txt");
+                webData = Encoding.UTF8.GetString(raw).ToLower();
+            }
+            catch (Exception)
+            {
+
+            }
             string[] temp;
             List<string> result = new List<string>();
-            Restriction restrictions = new Restriction();
-
-            string webData = Encoding.UTF8.GetString(raw);
-
-            //System.Console.WriteLine(webData);
 
             string[] lines = webData.Split('\n');
             foreach (string item in lines)
             {
-                if (item.Contains("User-Agent: *"))
+                if (item.Contains("user-agent: *"))
                 {
                     scope = true;
                 }
-                else if (item.Contains("User-Agent: "))
+                else if (item.Contains("user-agent: "))
                 {
                     scope = false;
                 }
 
                 if (scope == true)
                 {
-                    if (item.Contains("Allow"))
+                    if (item.Contains("allow"))
                     {
                         temp = item.Split(' ');
                         restrictions.allow.Add(temp[1]);
                     }
-                    else if (item.Contains("Disallow"))
+                    else if (item.Contains("disallow"))
                     {
                         temp = item.Split(' ');
                         restrictions.disallow.Add(temp[1]);
                     }
-                    else if(item.Contains("Crawl-delay"))
+                    else if(item.Contains("crawl-delay"))
                     {
                         temp = item.Split(' ');
                         restrictions.crawldelay = Convert.ToInt32(temp[1]);

@@ -8,5 +8,15 @@ namespace NearDubDetect
 {
     class Domain
     {
+        public string URL;
+        public Restriction restriction;
+
+        public Domain(string url, Restriction restrictioninput)
+        {
+            URL = url;
+            restriction = restrictioninput;
+        }
+
+        
     }
 }

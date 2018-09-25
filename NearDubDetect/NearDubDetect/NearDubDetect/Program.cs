@@ -10,6 +10,14 @@ namespace NearDubDetect
     {
         static void Main(string[] args)
         {
+            Crawler crawler = new Crawler("https://www.heste-nettet.dk/");
+            crawler.Crawl(20);
+
+            foreach (var item in crawler.websites)
+            {
+                Console.WriteLine(item.currentPath);
+            }
+
             /*
             string et = "<h2>Contrary to popular belief, Lorem Ipsum is not simply random text.</h1> It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.";
             string to = "Contrary test to popular belief, test Lorem psum is simply dummy text of the p Ipsum is not simply random text. It test has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.";
@@ -27,7 +35,7 @@ namespace NearDubDetect
             //System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
             //System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
             //System.Console.WriteLine(tester.Jaccard(fire, firee) + "%");
-            */
+            
 
             
             RobotTXTHandler RTHandler = new RobotTXTHandler();
@@ -46,7 +54,7 @@ namespace NearDubDetect
 
             System.Console.ReadLine(); 
 
-            /*
+            
             foreach (Shingle shingle in tester.FindShingles(tre))
             {
                 foreach(string str in shingle.words)
@@ -54,8 +62,11 @@ namespace NearDubDetect
                     System.Console.WriteLine(str);
 
                 }
-            }
-            System.Console.ReadLine();*/
+            }*/
+            Console.WriteLine(crawler.websites.Count);
+            Console.WriteLine(crawler.websites[1].HTMLContent);
+
+            Console.ReadLine();
         }
     }
 }
