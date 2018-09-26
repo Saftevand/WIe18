@@ -8,10 +8,11 @@ namespace NearDubDetect
 {
     class Website
     {
-        public Website(Domain domain, string url)
+        public Website(Domain domain, string url, string content)
         {
             DomainURL = domain;
             currentPath = url;
+            HTMLContent = content;
         }
         public Domain DomainURL;
         public string currentPath;

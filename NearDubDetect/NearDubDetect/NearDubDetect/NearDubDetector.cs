@@ -13,10 +13,9 @@ namespace NearDubDetect
 
         public NearDubDetector()
         {
-            randomList = GenerateRandomIntegers();
+            
         }
         List<Website> knownwebsitees = new List<Website>();
-        List<Int32> randomList = new List<int>();
 
         public List<Shingle> FindShingles(string textinput)
         {
@@ -107,51 +106,34 @@ namespace NearDubDetect
             string text2input = input2.HTMLContent;
             List<int> text1 = new List<int>();
             List<int> text2 = new List<int>();
-            List<int> shift1 = new List<int>(84);
-            List<int> shift2 = new List<int>(84);
-            
+            List <Int32> randomList = GenerateRandomIntegers();
 
             if (knownwebsitees.Contains(input1))
             {
-                shift1 = input1.Hashnumber;
+                text1 = input1.Hashnumber;
             }
             else
             {
                 text1 = FindHashNumber(text1input);
-                for (int i = 0; i < randomList.Count; i++)
-                {
-                    shift1.Add(BigShiftHash(text1, randomList[i]).Min());
-                }
-                input1.Hashnumber = shift1;
+                input1.Hashnumber = text1;
                 knownwebsitees.Add(input1);
             }
 
             if (knownwebsitees.Contains(input2))
             {
-                shift2 = input2.Hashnumber;
+                text2 = input2.Hashnumber;
             }
             else
             {
                 text2 = FindHashNumber(text2input);
-                for (int i = 0; i < randomList.Count; i++)
-                {
-                    shift2.Add(BigShiftHash(text2, randomList[i]).Min());
-                }
-                input2.Hashnumber = shift2;
+                input2.Hashnumber = text2;
                 knownwebsitees.Add(input2);
             }
 
             double identicalcounter = 0;
+            Int32 text1Hashes;
+            Int32 text2Hashes;
 
-            for (int i = 0; i < shift1.Count-1; i++)
-            {
-                if (shift1[i] == shift2[i])
-                {
-                    identicalcounter++;
-                }
-            }
-
-            /*
             foreach (Int32 item in randomList)
             {
                 text1Hashes = BigShiftHash(text1, item).Min();
@@ -160,7 +142,7 @@ namespace NearDubDetect
                 {
                     identicalcounter++;
                 }
-            }*/
+            }
 
             return (identicalcounter / 84) * 100;
        
