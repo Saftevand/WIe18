@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,18 @@ namespace NearDubDetect
         public static string StripTagsRegex(string source)
         {
             return Regex.Replace(source, "<.*?>", string.Empty);
+        }
+
+        public static string MasterStripper(string source)
+        {
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(source);
+            string result = "";
+            foreach (HtmlNode item in doc.DocumentNode.SelectNodes("//text()"))
+            {
+                result += item.InnerText;
+            }
+            return result;
         }
 
         /// <summary>

@@ -44,7 +44,7 @@ namespace NearDubDetect
                         {
                             if (!websites.Contains(_website) && add == false)
                             {
-                                if (NearDubDetector.Jaccard(item, _website) < 90)
+                                //if (NearDubDetector.Jaccard(item, _website) < 90)
                                 {
                                     add = true;
                                 }
@@ -55,7 +55,7 @@ namespace NearDubDetect
                         {
                             websites.Add(_website);
                             add = false;
-                            _website.DomainURL.LastVisisted = DateTime.Now;
+                            _website.DomainURL.LastVisited = DateTime.Now;
                         }
 
                         Console.WriteLine("Queue count before: " + queue.Count);
