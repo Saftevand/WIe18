@@ -15,6 +15,7 @@ namespace NearDubDetect
         {
             
         }
+        List<Website> knownwebsitees = new List<Website>();
 
         public List<Shingle> FindShingles(string textinput)
         {
@@ -70,14 +71,6 @@ namespace NearDubDetect
                     }
 
                     h += t;
-                    /*
-                    t = 0;
-                    foreach (char ch in word)
-                    {
-                        t += Convert.ToInt32(ch);
-                    }
-                    h += t / word.Length;
-                    */
                 }
                 returnlist.Add(Convert.ToInt32(h));
                 h = 0;
@@ -95,39 +88,6 @@ namespace NearDubDetect
             }
             return returnlist;
         }
-        /*
-        public List<int> FindHashNumber(string text)
-        {
-            List<Shingle> shingles = FindShingles(text);
-            List<List<int>> texthashes = new List<List<int>>();
-            List<int> returnlist = new List<int>();
-            Random rand = new Random();
-
-            for (int i = 0; i < 5; i++)
-            {
-                List<int> intermediateHash = new List<int>();
-                foreach (Shingle item in shingles)
-                {
-                    intermediateHash.Add(FindHashNumber(item));
-                }
-                texthashes.Add(intermediateHash);
-            }
-
-            foreach (List<int> item in texthashes)
-            {
-                //returnlist.Add(item.Min());
-                for (int i = 0; i < 84; i++)
-                {
-                    returnlist.Add(item[rand.Next(0,4)]);
-                }
-                for (int i = 0; i < 5; i++)
-                {
-                    returnlist.Add(item[i]);
-                }
-            }
-
-            return returnlist;
-        }*/
 
         public List<Int32> GenerateRandomIntegers()
         {
@@ -140,11 +100,36 @@ namespace NearDubDetect
             return liste;
         }
 
-        public double Jaccard(string text1input, string text2input)
+        public double Jaccard(Website input1, Website input2)
         {
-            List<Int32> randomList = GenerateRandomIntegers();
-            List<int> text1 = FindHashNumber(text1input);
-            List<int> text2 = FindHashNumber(text2input);
+            string text1input = input1.HTMLContent;
+            string text2input = input2.HTMLContent;
+            List<int> text1 = new List<int>();
+            List<int> text2 = new List<int>();
+            List <Int32> randomList = GenerateRandomIntegers();
+
+            if (knownwebsitees.Contains(input1))
+            {
+                text1 = input1.Hashnumber;
+            }
+            else
+            {
+                text1 = FindHashNumber(text1input);
+                input1.Hashnumber = text1;
+                knownwebsitees.Add(input1);
+            }
+
+            if (knownwebsitees.Contains(input2))
+            {
+                text2 = input2.Hashnumber;
+            }
+            else
+            {
+                text2 = FindHashNumber(text2input);
+                input2.Hashnumber = text2;
+                knownwebsitees.Add(input2);
+            }
+
             double identicalcounter = 0;
             Int32 text1Hashes;
             Int32 text2Hashes;
@@ -156,44 +141,11 @@ namespace NearDubDetect
                 if (text1Hashes == text2Hashes)
                 {
                     identicalcounter++;
-                }/*
-                text1Hashes = BigShiftHash(text1, item).Max();
-                text2Hashes = BigShiftHash(text2, item).Max();
-                if (text1Hashes == text2Hashes)
-                {
-                    identicalcounter++;
-                }*/
+                }
             }
 
             return (identicalcounter / 84) * 100;
-
-            /*
-            for (int i = 0; i < 5; i++)
-            {
-                if (text1[i] == text2[i])
-                {
-                    identicalcounter++;
-                }
-            }
-            */
-            foreach (int item in text1)
-            {
-                foreach (int item2 in text2)
-                {
-                    if (item == item2)
-                    {
-                        identicalcounter++;
-                        break;
-                    }
-                }
-            }
-            System.Console.WriteLine(identicalcounter);
-            if (identicalcounter == 0)
-            {
-                return 0;
-            }
-            return 100 * (identicalcounter / (25));
-                     
+       
         }
     }
 }

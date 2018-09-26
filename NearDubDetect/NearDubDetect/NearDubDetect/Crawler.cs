@@ -18,6 +18,7 @@ namespace NearDubDetect
         private Queue<Website> queue = new Queue<Website>();
         private Website _website;
         public List<Website> websites = new List<Website>();
+        bool add = true;
         public Crawler(string seedURL)
         {
             _seedURL = seedURL;
@@ -26,32 +27,54 @@ namespace NearDubDetect
 
         public void Crawl(int amountOfPages)
         {
-            processNewPage(_seedURL);
-            while (queue.Count != 0)
-            {
-                websites.Add(queue.Dequeue());
-            }
-            while(queue.Count < amountOfPages)
+            List<Website> tempWebsites = new List<Website>();
+            ProcessNewPage(_seedURL);
+            
+            while(websites.Count < amountOfPages)
             {
                 if (queue.Count > 0)
                 {
                     _website = queue.Dequeue();
 
-                    foreach (Website item in websites)
+                    if (true)//_website.DomainURL.LastVisisted)
                     {
-                        if(NearDubDetector.Jaccard(item.HTMLContent, _website.HTMLContent) < 80)
+                        tempWebsites = new List<Website>();
+
+                        foreach (Website item in websites)
+                        {
+                            if (!websites.Contains(_website) && add == false)
+                            {
+                                if (NearDubDetector.Jaccard(item, _website) < 90)
+                                {
+                                    add = true;
+                                }
+                            }
+                        }
+
+                        if (add)
                         {
                             websites.Add(_website);
+                            add = false;
+                            _website.DomainURL.LastVisisted = DateTime.Now;
                         }
+
+                        Console.WriteLine("Queue count before: " + queue.Count);
+                        Console.WriteLine("Websites" + websites.Count);
+                        ProcessNewPage(_website.currentPath);
+                        Console.WriteLine("Queue count after: " + queue.Count + "\n");
                     }
-                    processNewPage(_website.currentPath);
+                    else
+                    {
+                        queue.Enqueue(_website);
+                    }
                 }
                 else break;
             }
+            
         }
 
 
-        public void processNewPage(string URL)
+        public void ProcessNewPage(string URL)
         {
             WebClient wc = new WebClient();
             byte[] raw = wc.DownloadData(URL);
@@ -61,6 +84,7 @@ namespace NearDubDetect
             HtmlDocument htmlDocument = htmlweb.Load(URL);
             List<string> urls =  htmlDocument.DocumentNode.SelectNodes("//a[@href]").Select(i => i.GetAttributeValue("href", null)).ToList();
             List<string> banned = new List<string>();
+            
             foreach (string item in urls)
             {
                 if (item.Contains("facebook.com"))
@@ -72,12 +96,13 @@ namespace NearDubDetect
             {
                 urls.Remove(item);
             }
+            
 
             string url1 = "";
             foreach (string url in urls)
             {
-                //try
-                //{
+                try
+                {
                     if (!url.Contains("www"))
                     {
                         url1 = URL.Remove(URL.Length-1,1) + url;
@@ -95,25 +120,25 @@ namespace NearDubDetect
                         dom = new Domain(domain, RobotTXTHandler.FindRestrictions(domain));
                         domains.Add(dom);
                     }
-                try
-                {
+                
                     raw = wc.DownloadData(url1);
                     webData = Encoding.UTF8.GetString(raw);
                     Website tempwebsite = new Website(dom, url1, webData);
-                    if (!dom.restriction.disallow.Contains(tempwebsite.currentPath.Remove(0, tempwebsite.DomainURL.URL.Length)) && dom.URL != "www.facebook.com")
+                    if (!dom.restriction.disallow.Contains(tempwebsite.currentPath.Remove(0, tempwebsite.DomainURL.URL.Length)))
                     {
-                        if (!queue.Contains(tempwebsite))
+                        if (!queue.Contains(tempwebsite) && !websites.Contains(tempwebsite))
                         {
                             queue.Enqueue(tempwebsite);
                         }
                     }
+                    System.Threading.Thread.Sleep(dom.restriction.crawldelay * 1000);
+
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
                     
-                    System.Threading.Thread.Sleep(dom.restriction.crawldelay * 1000);
                 //}
                 //catch (Exception)
                 //{

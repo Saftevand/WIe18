@@ -17,6 +17,7 @@ namespace NearDubDetect
         public Domain DomainURL;
         public string currentPath;
         public string HTMLContent;
+        public List<int> Hashnumber;
 
         public override bool Equals(Object obj)
         {

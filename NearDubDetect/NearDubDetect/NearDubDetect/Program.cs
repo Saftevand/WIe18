@@ -11,16 +11,16 @@ namespace NearDubDetect
         static void Main(string[] args)
         {
             Crawler crawler = new Crawler("https://www.heste-nettet.dk/");
-            crawler.Crawl(20);
-            /*
+            crawler.Crawl(200);
+            
             foreach (var item in crawler.websites)
             {
                 Console.WriteLine(item.currentPath);
             }
-            */
+            
             
             Console.WriteLine(crawler.websites.Count);
-            Console.WriteLine(crawler.websites[1].HTMLContent);
+            //Console.WriteLine(crawler.websites[1].HTMLContent);
 
             Console.ReadLine();
         }
