@@ -16,7 +16,7 @@ namespace NearDubDetect
         static void testCrawler()
         {
             Crawler crawler = new Crawler("https://www.heste-nettet.dk/");
-            crawler.Crawl(10);
+            crawler.Crawl(200);
             QueryTool queryMaster = new QueryTool();
             int websiteCounter = 0;
             foreach (var item in crawler.websites)
@@ -26,7 +26,7 @@ namespace NearDubDetect
                 websiteCounter++;
             }
 
-            List<int> pageResults = queryMaster.PassQuery("Hjælp Islandsk Pony");
+            List<int> pageResults = queryMaster.PassQuery("Poppelgårdens Notre Ravel blev");
             foreach (int index in pageResults)
             {
                 Console.WriteLine(crawler.websites[index].currentPath);

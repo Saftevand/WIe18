@@ -23,9 +23,13 @@ namespace NearDubDetect
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(source);
             string result = "";
-            foreach (HtmlNode item in doc.DocumentNode.SelectNodes("//text()"))
+            IEnumerable<HtmlNode> nodes = doc.DocumentNode.Descendants().Where(n =>
+               n.NodeType == HtmlNodeType.Text &&
+               n.ParentNode.Name != "script" &&
+               n.ParentNode.Name != "style");
+            foreach (HtmlNode node in nodes)
             {
-                result += item.InnerText;
+                result += node.InnerText;
             }
             return result;
         }
