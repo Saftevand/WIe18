@@ -16,14 +16,3 @@ C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubD
 C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\HtmlAgilityPack.pdb
 C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\HtmlAgilityPack.xml
 C:\Users\M0107\Documents\Repos\SW7\WI\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.csproj.CopyComplete
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.csprojAssemblyReference.cache
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.csproj.CoreCompileInputs.cache
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\NearDubDetect.exe.config
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\NearDubDetect.exe
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\NearDubDetect.pdb
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\HtmlAgilityPack.dll
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\HtmlAgilityPack.pdb
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\bin\Debug\HtmlAgilityPack.xml
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.csproj.CopyComplete
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.exe
-C:\Users\palmi\Documents\AAU\WIe18\NearDubDetect\NearDubDetect\NearDubDetect\obj\Debug\NearDubDetect.pdb
