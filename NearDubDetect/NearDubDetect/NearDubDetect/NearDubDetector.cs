@@ -109,7 +109,22 @@ namespace NearDubDetect
             List<int> text2 = new List<int>();
             List<int> shift1 = new List<int>(84);
             List<int> shift2 = new List<int>(84);
-            
+
+            if (input1.HTMLContent == "" || input1.HTMLContent == null)
+            {
+                if (input2.HTMLContent == "" || input2.HTMLContent == null)
+                {
+                    return 100;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            if (input2.HTMLContent == "" || input2.HTMLContent == null)
+            {
+                return 0;
+            }
 
             if (knownwebsitees.Contains(input1))
             {
