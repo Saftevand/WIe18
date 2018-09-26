@@ -82,7 +82,15 @@ namespace NearDubDetect
 
             HtmlWeb htmlweb = new HtmlWeb();
             HtmlDocument htmlDocument = htmlweb.Load(URL);
-            List<string> urls =  htmlDocument.DocumentNode.SelectNodes("//a[@href]").Select(i => i.GetAttributeValue("href", null)).ToList();
+            List<string> urls = new List<string>();
+            try
+            {
+                urls = htmlDocument.DocumentNode.SelectNodes("//a[@href]").Select(i => i.GetAttributeValue("href", null)).ToList();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             List<string> banned = new List<string>();
             
             foreach (string item in urls)
@@ -98,14 +106,22 @@ namespace NearDubDetect
             }
             
 
-            string url1 = "";
+            string url1;
             foreach (string url in urls)
             {
                 try
                 {
+                    //Console.WriteLine(url.IndexOf('h').ToString() + url.IndexOf('t').ToString() + url.IndexOf('p').ToString());
                     if (!url.Contains("www"))
                     {
-                        url1 = URL.Remove(URL.Length-1,1) + url;
+                        if(url.IndexOf('h') == 0 && url.IndexOf('t') == 1 && url.IndexOf('p') == 3)
+                        {
+                            url1 = url;
+                        }
+                        else
+                        {
+                            url1 = URL.Remove(URL.Length - 1, 1) + url;
+                        }
                     }
                     else
                     {
