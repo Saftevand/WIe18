@@ -10,6 +10,7 @@ namespace NearDubDetect
     {
         public string URL;
         public Restriction restriction;
+        public DateTime LastVisisted;
 
         public Domain(string url, Restriction restrictioninput)
         {

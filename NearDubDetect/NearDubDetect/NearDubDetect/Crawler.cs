@@ -28,7 +28,13 @@ namespace NearDubDetect
         public void Crawl(int amountOfPages)
         {
             List<Website> tempWebsites = new List<Website>();
-            ProcessNewPage(_seedURL);
+            Uri a = new Uri(_seedURL);
+
+            Domain seeddomain = new Domain(a.Host, RobotTXTHandler.FindRestrictions(a.Host));
+            domains.Add(seeddomain);
+            Website seedwebsite = new Website(seeddomain, _seedURL);
+            websites.Add(seedwebsite);
+            ProcessNewPage(seedwebsite);
             
             while(websites.Count < amountOfPages)
             {
@@ -36,9 +42,10 @@ namespace NearDubDetect
                 {
                     _website = queue.Dequeue();
 
-                    if (true)//_website.DomainURL.LastVisisted)
+                    if (DateTime.Now > _website.DomainURL.LastVisisted + new TimeSpan(0, 0, _website.DomainURL.restriction.crawldelay))
                     {
                         tempWebsites = new List<Website>();
+                        ProcessNewPage(_website);
 
                         foreach (Website item in websites)
                         {
@@ -60,7 +67,6 @@ namespace NearDubDetect
 
                         Console.WriteLine("Queue count before: " + queue.Count);
                         Console.WriteLine("Websites" + websites.Count);
-                        ProcessNewPage(_website.currentPath);
                         Console.WriteLine("Queue count after: " + queue.Count + "\n");
                     }
                     else
@@ -69,21 +75,18 @@ namespace NearDubDetect
                     }
                 }
                 else break;
-            }
-            
+            }            
         }
 
-
-        public void ProcessNewPage(string URL)
+        public void ProcessNewPage(Website inputwebsite)
         {
-            WebClient wc = new WebClient();
-            byte[] raw = wc.DownloadData(URL);
-            string webData = Encoding.UTF8.GetString(raw);
-
+            string URL = inputwebsite.currentPath;
             HtmlWeb htmlweb = new HtmlWeb();
             HtmlDocument htmlDocument = htmlweb.Load(URL);
             List<string> urls =  htmlDocument.DocumentNode.SelectNodes("//a[@href]").Select(i => i.GetAttributeValue("href", null)).ToList();
             List<string> banned = new List<string>();
+            inputwebsite.HTMLContent = htmlDocument.Text;
+            //websites.Find(x => x.currentPath == URL).HTMLContent = htmlDocument.Text;
             
             foreach (string item in urls)
             {
@@ -120,10 +123,8 @@ namespace NearDubDetect
                         dom = new Domain(domain, RobotTXTHandler.FindRestrictions(domain));
                         domains.Add(dom);
                     }
-                
-                    raw = wc.DownloadData(url1);
-                    webData = Encoding.UTF8.GetString(raw);
-                    Website tempwebsite = new Website(dom, url1, webData);
+               
+                    Website tempwebsite = new Website(dom, url1);
                     if (!dom.restriction.disallow.Contains(tempwebsite.currentPath.Remove(0, tempwebsite.DomainURL.URL.Length)))
                     {
                         if (!queue.Contains(tempwebsite) && !websites.Contains(tempwebsite))
@@ -131,26 +132,12 @@ namespace NearDubDetect
                             queue.Enqueue(tempwebsite);
                         }
                     }
-                    System.Threading.Thread.Sleep(dom.restriction.crawldelay * 1000);
-
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                }
-                    
-                //}
-                //catch (Exception)
-                //{
-                //    
-                //}
-                
-                
+                }                
             }
-
-
-            //webData = Regex.Replace(webData, "[^a-zA-Z0-9% -]", string.Empty);
-
         }
     }
 }
