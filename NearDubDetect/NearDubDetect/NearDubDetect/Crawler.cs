@@ -64,10 +64,9 @@ namespace NearDubDetect
                             add = false;
                             _website.DomainURL.LastVisisted = DateTime.Now;
                         }
-
-                        Console.WriteLine("Queue count before: " + queue.Count);
-                        Console.WriteLine("Websites" + websites.Count);
-                        Console.WriteLine("Queue count after: " + queue.Count + "\n");
+                        
+                        Console.WriteLine("Website count: " + websites.Count);
+                        Console.WriteLine("Queue count: " + queue.Count + "\n");
                     }
                     else
                     {
@@ -80,80 +79,94 @@ namespace NearDubDetect
 
         public void ProcessNewPage(Website inputwebsite)
         {
-            string URL = inputwebsite.currentPath;
-            HtmlWeb htmlweb = new HtmlWeb();
-            HtmlDocument htmlDocument = htmlweb.Load(URL);
-            List<string> urls = new List<string>();
             try
             {
-                urls = htmlDocument.DocumentNode.SelectNodes("//a[@href]").Select(i => i.GetAttributeValue("href", null)).ToList();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            List<string> banned = new List<string>();
-            inputwebsite.HTMLContent = htmlDocument.Text;
-            //websites.Find(x => x.currentPath == URL).HTMLContent = htmlDocument.Text;
-            
-            foreach (string item in urls)
-            {
-                if (item.Contains("facebook.com"))
-                {
-                    banned.Add(item);
-                }
-            }
-            foreach (string item in banned)
-            {
-                urls.Remove(item);
-            }
-            
-
-            string url1;
-            foreach (string url in urls)
-            {
+                string URL = inputwebsite.currentPath;
+                HtmlWeb htmlweb = new HtmlWeb();
+                HtmlDocument htmlDocument = htmlweb.Load(URL);
+                List<string> urls = new List<string>();
                 try
                 {
-                    //Console.WriteLine(url.IndexOf('h').ToString() + url.IndexOf('t').ToString() + url.IndexOf('p').ToString());
-                    if (!url.Contains("www"))
-                    {
-                        if(url.IndexOf('h') == 0 && url.IndexOf('t') == 1 && url.IndexOf('p') == 3)
-                        {
-                            url1 = url;
-                        }
-                        else
-                        {
-                            url1 = URL.Remove(URL.Length - 1, 1) + url;
-                        }
-                    }
-                    else
-                    {
-                        url1 = url;
-                    }
-
-                    Uri uri = new Uri(url1);
-                    string domain = uri.Host;
-                    Domain dom = domains.Find(x => x.URL == domain);
-                    if (dom == null)
-                    {
-                        dom = new Domain(domain, RobotTXTHandler.FindRestrictions(domain));
-                        domains.Add(dom);
-                    }
-               
-                    Website tempwebsite = new Website(dom, url1);
-                    if (!dom.restriction.disallow.Contains(tempwebsite.currentPath.Remove(0, tempwebsite.DomainURL.URL.Length)))
-                    {
-                        if (!queue.Contains(tempwebsite) && !websites.Contains(tempwebsite))
-                        {
-                            queue.Enqueue(tempwebsite);
-                        }
-                    }
+                    urls = htmlDocument.DocumentNode.SelectNodes("//a[@href]").Select(i => i.GetAttributeValue("href", null)).ToList();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                }                
+                }
+                List<string> banned = new List<string>();
+                inputwebsite.HTMLContent = htmlDocument.Text;
+                //websites.Find(x => x.currentPath == URL).HTMLContent = htmlDocument.Text;
+
+                foreach (string item in urls)
+                {
+                    if (item.Contains("facebook.com"))
+                    {
+                        banned.Add(item);
+                    }
+                }
+                foreach (string item in banned)
+                {
+                    urls.Remove(item);
+                }
+
+
+                string url1;
+                string httpstring = "http";
+                foreach (string url in urls)
+                {
+                    try
+                    {
+                        //Console.WriteLine(url.IndexOf('h').ToString() + url.IndexOf('t').ToString() + url.IndexOf('p').ToString());
+                        if (!url.Contains("www"))
+                        {
+                            if (url.IndexOf('h') == 0 && url.IndexOf('t') == 1 && url.IndexOf('p') == 3)
+                            {
+                                url1 = url;
+                            }
+                            else if (url[0] == '/' && url[1] == '/')
+                            {
+                                url1 = httpstring + url;
+                            }
+                            else
+                            {
+                                url1 = URL.Remove(URL.Length - 1, 1) + url;
+                            }
+                        }
+                        else
+                        {
+                            url1 = url;
+                        }
+
+                        Uri uri = new Uri(url1);
+                        string domain = uri.Host;
+                        Domain dom = domains.Find(x => x.URL == domain);
+                        if (dom == null)
+                        {
+                            dom = new Domain(domain, RobotTXTHandler.FindRestrictions(domain));
+                            domains.Add(dom);
+                        }
+
+                        Website tempwebsite = new Website(dom, url1);
+                        if (!dom.restriction.disallow.Contains(tempwebsite.currentPath.Remove(0, tempwebsite.DomainURL.URL.Length)))
+                        {
+                            if (!queue.Contains(tempwebsite) && !websites.Contains(tempwebsite))
+                            {
+                                queue.Enqueue(tempwebsite);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
             }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e.Message);
+            }
+            
         }
     }
 }

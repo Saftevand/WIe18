@@ -121,7 +121,7 @@ namespace NearDubDetect
                     return 0;
                 }
             }
-            if (input2.HTMLContent == "" || input2.HTMLContent == null)
+            if (input2.HTMLContent == "" || input2.HTMLContent == null || input1.HTMLContent.Split(' ').Length < 4 || input2.HTMLContent.Split(' ').Length < 6)
             {
                 return 0;
             }

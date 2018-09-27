@@ -10,8 +10,8 @@ namespace NearDubDetect
     {
         static void Main(string[] args)
         {
-            Crawler crawler = new Crawler("https://www.heste-nettet.dk/");
-            crawler.Crawl(500);
+            Crawler crawler = new Crawler("https://www.google.com");
+            crawler.Crawl(700);
             
             foreach (var item in crawler.websites)
             {
