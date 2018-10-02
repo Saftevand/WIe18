@@ -28,23 +28,30 @@ namespace NearDubDetect
         public void Crawl(int amountOfPages)
         {
             List<Website> tempWebsites = new List<Website>();
-            ProcessNewPage(_seedURL);
-            
-            while(websites.Count < amountOfPages)
+            Uri a = new Uri(_seedURL);
+
+            Domain seeddomain = new Domain(a.Host, RobotTXTHandler.FindRestrictions(a.Host));
+            domains.Add(seeddomain);
+            Website seedwebsite = new Website(seeddomain, _seedURL);
+            websites.Add(seedwebsite);
+            ProcessNewPage(seedwebsite);
+
+            while (websites.Count < amountOfPages)
             {
                 if (queue.Count > 0)
                 {
                     _website = queue.Dequeue();
 
-                    if (true)//_website.DomainURL.LastVisisted)
+                    if (DateTime.Now > _website.DomainURL.LastVisited + new TimeSpan(0, 0, _website.DomainURL.restriction.crawldelay))
                     {
                         tempWebsites = new List<Website>();
+                        ProcessNewPage(_website);
 
                         foreach (Website item in websites)
                         {
                             if (!websites.Contains(_website) && add == false)
                             {
-                                //if (NearDubDetector.Jaccard(item, _website) < 90)
+                                if (NearDubDetector.Jaccard(item, _website) < 90)
                                 {
                                     add = true;
                                 }
@@ -57,7 +64,7 @@ namespace NearDubDetect
                             add = false;
                             _website.DomainURL.LastVisited = DateTime.Now;
                         }
-                        
+
                         Console.WriteLine("Website count: " + websites.Count);
                         Console.WriteLine("Queue count: " + queue.Count + "\n");
                     }
@@ -68,11 +75,9 @@ namespace NearDubDetect
                 }
                 else break;
             }
-            
         }
 
-
-        public void ProcessNewPage(string URL)
+        public void ProcessNewPage(Website inputwebsite)
         {
             try
             {
@@ -94,7 +99,7 @@ namespace NearDubDetect
 
                 foreach (string item in urls)
                 {
-                    if (item.Contains("facebook.com"))
+                    if (item.Contains("facebook.com") || item.ToLower().Contains(".pdf"))
                     {
                         banned.Add(item);
                     }
@@ -161,7 +166,7 @@ namespace NearDubDetect
 
                 Console.WriteLine(e.Message);
             }
-            
+
         }
     }
 }

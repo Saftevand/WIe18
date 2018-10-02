@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NearDubDetect
 {
-    class Domain
+    public class Domain
     {
         public string URL;
         public Restriction restriction;

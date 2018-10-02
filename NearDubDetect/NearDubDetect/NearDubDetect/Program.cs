@@ -16,17 +16,24 @@ namespace NearDubDetect
         static void testCrawler()
         {
             Crawler crawler = new Crawler("https://www.heste-nettet.dk/");
-            crawler.Crawl(200);
+            crawler.Crawl(100);
             QueryTool queryMaster = new QueryTool();
             int websiteCounter = 0;
             foreach (var item in crawler.websites)
             {
-                string noHtmlString = HtmlRemoval.MasterStripper(item.HTMLContent);
-                queryMaster.GenerateTokens(noHtmlString, websiteCounter);
-                websiteCounter++;
+                try
+                {
+                    string noHtmlString = HtmlRemoval.MasterStripper(item.HTMLContent);
+                    queryMaster.GenerateTokens(noHtmlString, websiteCounter);
+                    websiteCounter++;
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
 
-            List<int> pageResults = queryMaster.PassQuery("Poppelgårdens Notre Ravel blev");
+            List<int> pageResults = queryMaster.PassQuery("Torsdag var voltigør Sheena Bendixen, Longefører Lasse Kristensen og hesten Klintholms Ramstein");
             foreach (int index in pageResults)
             {
                 Console.WriteLine(crawler.websites[index].currentPath);

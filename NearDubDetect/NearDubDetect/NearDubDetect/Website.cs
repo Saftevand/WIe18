@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace NearDubDetect
 {
-    class Website
+    public class Website
     {
-        public Website(Domain domain, string url, string content)
+        public Website(Domain domain, string url)
         {
             DomainURL = domain;
             currentPath = url;
-            HTMLContent = content;
         }
         public Domain DomainURL;
         public string currentPath;
