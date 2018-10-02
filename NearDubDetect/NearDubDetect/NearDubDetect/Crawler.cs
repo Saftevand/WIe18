@@ -35,14 +35,14 @@ namespace NearDubDetect
             Website seedwebsite = new Website(seeddomain, _seedURL);
             websites.Add(seedwebsite);
             ProcessNewPage(seedwebsite);
-            
-            while(websites.Count < amountOfPages)
+
+            while (websites.Count < amountOfPages)
             {
                 if (queue.Count > 0)
                 {
                     _website = queue.Dequeue();
 
-                    if (DateTime.Now > _website.DomainURL.LastVisisted + new TimeSpan(0, 0, _website.DomainURL.restriction.crawldelay))
+                    if (DateTime.Now > _website.DomainURL.LastVisited + new TimeSpan(0, 0, _website.DomainURL.restriction.crawldelay))
                     {
                         tempWebsites = new List<Website>();
                         ProcessNewPage(_website);
@@ -62,9 +62,9 @@ namespace NearDubDetect
                         {
                             websites.Add(_website);
                             add = false;
-                            _website.DomainURL.LastVisisted = DateTime.Now;
+                            _website.DomainURL.LastVisited = DateTime.Now;
                         }
-                        
+
                         Console.WriteLine("Website count: " + websites.Count);
                         Console.WriteLine("Queue count: " + queue.Count + "\n");
                     }
@@ -74,7 +74,7 @@ namespace NearDubDetect
                     }
                 }
                 else break;
-            }            
+            }
         }
 
         public void ProcessNewPage(Website inputwebsite)
@@ -99,7 +99,7 @@ namespace NearDubDetect
 
                 foreach (string item in urls)
                 {
-                    if (item.Contains("facebook.com"))
+                    if (item.Contains("facebook.com") || item.ToLower().Contains(".pdf"))
                     {
                         banned.Add(item);
                     }
@@ -166,7 +166,7 @@ namespace NearDubDetect
 
                 Console.WriteLine(e.Message);
             }
-            
+
         }
     }
 }

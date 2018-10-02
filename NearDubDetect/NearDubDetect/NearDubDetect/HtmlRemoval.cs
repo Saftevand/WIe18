@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,22 @@ namespace NearDubDetect
                 return "";
             }
             return Regex.Replace(source, "<.*?>", string.Empty);
+        }
+
+        public static string MasterStripper(string source)
+        {
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(source);
+            string result = "";
+            IEnumerable<HtmlNode> nodes = doc.DocumentNode.Descendants().Where(n =>
+               n.NodeType == HtmlNodeType.Text &&
+               n.ParentNode.Name != "script" &&
+               n.ParentNode.Name != "style");
+            foreach (HtmlNode node in nodes)
+            {
+                result += node.InnerText;
+            }
+            return result;
         }
 
         /// <summary>

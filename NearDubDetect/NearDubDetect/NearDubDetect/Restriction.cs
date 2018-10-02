@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NearDubDetect
 {
-    class Restriction
+    public class Restriction
     {
         public List<string> allow = new List<string>();
         public List<string> disallow = new List<string>();

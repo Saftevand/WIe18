@@ -96,7 +96,7 @@ namespace NearDubDetect
             Random RNG = new Random();
             for (int i = 0; i < 84; i++)
             {
-                liste.Add(RNG.Next(0,1000000));
+                liste.Add(RNG.Next(0, 1000000));
             }
             return liste;
         }
@@ -158,7 +158,7 @@ namespace NearDubDetect
 
             double identicalcounter = 0;
 
-            for (int i = 0; i < shift1.Count-1; i++)
+            for (int i = 0; i < shift1.Count - 1; i++)
             {
                 if (shift1[i] == shift2[i])
                 {
@@ -178,7 +178,7 @@ namespace NearDubDetect
             }*/
 
             return (identicalcounter / 84) * 100;
-       
+
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NearDubDetect
 {
-    class Website
+    public class Website
     {
         public Website(Domain domain, string url)
         {
