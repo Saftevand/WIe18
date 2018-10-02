@@ -15,6 +15,10 @@ namespace NearDubDetect
         /// </summary>
         public static string StripTagsRegex(string source)
         {
+            if (source == null)
+            {
+                return "";
+            }
             return Regex.Replace(source, "<.*?>", string.Empty);
         }
 
