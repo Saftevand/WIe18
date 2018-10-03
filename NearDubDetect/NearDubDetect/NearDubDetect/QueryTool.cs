@@ -160,7 +160,7 @@ namespace NearDubDetect
             ,"yours"
             ,"yourself"
             ,"yourselves"});
-            private Dictionary<string, List<int>> incidenceVector = new Dictionary<string, List<int>>();
+            private Dictionary<string, TermIndexer> incidenceVector = new Dictionary<string, TermIndexer>();
 
             public List<string> GenerateTokens(string input, int idOfDocument)
             {
@@ -177,29 +177,34 @@ namespace NearDubDetect
                 {
                     if (incidenceVector.ContainsKey(token))
                     {
-                        if (!incidenceVector[token].Contains(idOfDocument))
+                        if (!incidenceVector[token].Documents.Exists(doc => doc.DocumentID == idOfDocument))
                         {
-                            incidenceVector[token].Add(idOfDocument);
+                            incidenceVector[token].AddNewDocument(idOfDocument);
+                        }
+                        else
+                        {
+                            incidenceVector[token].Documents.Find(doc => doc.DocumentID == idOfDocument).TermFrequency++;
                         }
 
                     }
                     else
                     {
-                        incidenceVector.Add(token, new List<int>());
-                        incidenceVector[token].Add(idOfDocument);
+                        incidenceVector.Add(token, new TermIndexer());
+                        incidenceVector[token].AddNewDocument(idOfDocument);
                     }
                 }
-
+                foreach (var value in incidenceVector.Values)
+                {
+                    value.Calc_tfidf();
+                }
                 return tokens;
             }
 
             public List<int> PassQuery(string inputQuery)
             {
-                List<string> disectedQuery = new List<string>(inputQuery.ToLower().Split(' '));
-                disectedQuery.RemoveAll(e => stopWords.Exists(sw => sw.Equals(e)));
-
+                List<string> disectedQuery = GenerateTokens(inputQuery, -1);
                 List<string> foundTokens = new List<string>();
-                List<int> blacklistedDocuments = new List<int>();
+                List<DocumentInfo> blacklistedDocuments = new List<DocumentInfo>();
                 int queryTokenCounter = 0;
                 foreach (string queryWord in disectedQuery)
                 {
@@ -207,7 +212,7 @@ namespace NearDubDetect
                     {
                         if(queryTokenCounter != disectedQuery.Count)
                         {
-                            blacklistedDocuments.AddRange(incidenceVector[disectedQuery[queryTokenCounter + 1]]);
+                        blacklistedDocuments.AddRange(incidenceVector[queryWord].Documents);
                         }
                     }
                     if (incidenceVector.ContainsKey(queryWord) && !foundTokens.Contains(queryWord))
@@ -216,11 +221,15 @@ namespace NearDubDetect
                     }
                     queryTokenCounter++;
                 }
+
+                
+
                 List<int> foundPages = new List<int>();
+            foundpages.AddRange(CosineScoreCalculator());
                 foundPages.AddRange(ANDpageFinder(foundTokens));
                 foundPages.AddRange(ORpageFinder(foundTokens));
                 foundPages = foundPages.Distinct().ToList();
-                foundPages.RemoveAll(e => blacklistedDocuments.Contains(e));
+                foundPages.RemoveAll(e => blacklistedDocuments.Exists(bDoc => bDoc.DocumentID == e));
 
                 foundPages.ForEach(e => Console.WriteLine(e));
 
@@ -231,13 +240,13 @@ namespace NearDubDetect
             public List<int> ANDpageFinder(List<string> queryTokens)
             {
                 List<int> commonIndexes = new List<int>();
-                List<int> firstDocIndexes = new List<int>(incidenceVector[queryTokens[0]]);
+                List<int> firstDocIndexes = new List<int>(incidenceVector[queryTokens[0]].DocumentIDs());
                 if (queryTokens.Count > 1)
                 {
-                    commonIndexes = incidenceVector[queryTokens[1]].Intersect(firstDocIndexes).ToList();
+                    commonIndexes = incidenceVector[queryTokens[1]].DocumentIDs().Intersect(firstDocIndexes).ToList();
                     for (int i = 2; i < queryTokens.Count; i++)
                     {
-                        commonIndexes = incidenceVector[queryTokens[i]].Intersect(commonIndexes).ToList();
+                        commonIndexes = incidenceVector[queryTokens[i]].DocumentIDs().Intersect(commonIndexes).ToList();
                     }
                     return commonIndexes;
                 }
@@ -252,7 +261,7 @@ namespace NearDubDetect
                 List<int> pageIndexes = new List<int>();
                 foreach (string queryToken in queryTokens)
                 {
-                    pageIndexes.AddRange(incidenceVector[queryToken]);
+                    pageIndexes.AddRange(incidenceVector[queryToken].DocumentIDs());
                 }
                 pageIndexes.Sort((x, y) =>
                 {

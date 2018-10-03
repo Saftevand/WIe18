@@ -9,7 +9,7 @@ using HtmlAgilityPack;
 
 namespace NearDubDetect
 {
-    class Crawler
+    public class Crawler
     {
         RobotTXTHandler RobotTXTHandler = new RobotTXTHandler();
         NearDubDetector NearDubDetector = new NearDubDetector();
@@ -17,6 +17,7 @@ namespace NearDubDetect
         private List<Domain> domains = new List<Domain>();
         private Queue<Website> queue = new Queue<Website>();
         private Website _website;
+        public static int numberOfDocuments;
         public List<Website> websites = new List<Website>();
         bool add = true;
         public Crawler(string seedURL)
@@ -61,6 +62,7 @@ namespace NearDubDetect
                         if (add)
                         {
                             websites.Add(_website);
+                            numberOfDocuments++;
                             add = false;
                             _website.DomainURL.LastVisited = DateTime.Now;
                         }
