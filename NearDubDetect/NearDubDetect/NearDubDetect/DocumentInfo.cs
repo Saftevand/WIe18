@@ -12,6 +12,7 @@ namespace NearDubDetect
         private int _termFrequency;
         private double _termFrequencyStar;
         private double _tfidf;
+        private double _normalised;
 
         public DocumentInfo(int documentID)
         {
@@ -22,6 +23,7 @@ namespace NearDubDetect
         public double TermFrequencyStar { get => _termFrequencyStar; set => _termFrequencyStar = value; }
         public int TermFrequency { get => _termFrequency; set => _termFrequency = value; }
         public int DocumentID { get => _documentID; set => _documentID = value; }
+        public double Normalised { get => _normalised; set => _normalised = value; }
 
         public void IncrementTF()
         {

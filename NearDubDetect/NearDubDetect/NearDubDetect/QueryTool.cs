@@ -10,7 +10,7 @@ namespace NearDubDetect
     class QueryTool
     {
 
-            private List<string> stopWords = new List<string>(new string[] { "-","?",":",";","a","about","above","after","again","against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but"
+        private List<string> stopWords = new List<string>(new string[] { "-","?",":",";","a","about","above","after","again","against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but"
             ,"by"
             ,"can't"
             ,"cannot"
@@ -160,137 +160,187 @@ namespace NearDubDetect
             ,"yours"
             ,"yourself"
             ,"yourselves"});
-            private Dictionary<string, TermIndexer> incidenceVector = new Dictionary<string, TermIndexer>();
+        private Dictionary<string, TermIndexer> incidenceVector = new Dictionary<string, TermIndexer>();
 
-            public List<string> GenerateTokens(string input, int idOfDocument)
+        public List<string> GenerateTokens(string input, int idOfDocument)
+        {
+            string lowerCaseInput = input.ToLower();
+            List<string> words = new List<string>(lowerCaseInput.Split(' '));
+            words.RemoveAll(e => stopWords.Exists(sw => sw.Equals(e)));
+            List<string> tokens = new List<string>();
+            foreach (string word in words)
             {
-                string lowerCaseInput = input.ToLower();
-                List<string> words = new List<string>(lowerCaseInput.Split(' '));
-                words.RemoveAll(e => stopWords.Exists(sw => sw.Equals(e)));
-                List<string> tokens = new List<string>();
-                foreach (string word in words)
-                {
-                    tokens.Add(PorterStemming(word));
-                }
+                tokens.Add(PorterStemming(word));
+            }
 
-                foreach (string token in tokens)
+            foreach (string token in tokens)
+            {
+                if (incidenceVector.ContainsKey(token))
                 {
-                    if (incidenceVector.ContainsKey(token))
+                    if (!incidenceVector[token].Documents.Exists(doc => doc.DocumentID == idOfDocument))
                     {
-                        if (!incidenceVector[token].Documents.Exists(doc => doc.DocumentID == idOfDocument))
-                        {
-                            incidenceVector[token].AddNewDocument(idOfDocument);
-                        }
-                        else
-                        {
-                            incidenceVector[token].Documents.Find(doc => doc.DocumentID == idOfDocument).TermFrequency++;
-                        }
-
+                        incidenceVector[token].AddNewDocument(idOfDocument);
                     }
                     else
                     {
-                        incidenceVector.Add(token, new TermIndexer());
-                        incidenceVector[token].AddNewDocument(idOfDocument);
+                        incidenceVector[token].Documents.Find(doc => doc.DocumentID == idOfDocument).IncrementTF();
                     }
-                }
-                foreach (var value in incidenceVector.Values)
-                {
-                    value.Calc_tfidf();
-                }
-                return tokens;
-            }
 
-            public List<int> PassQuery(string inputQuery)
-            {
-                List<string> disectedQuery = GenerateTokens(inputQuery, -1);
-                List<string> foundTokens = new List<string>();
-                List<DocumentInfo> blacklistedDocuments = new List<DocumentInfo>();
-                int queryTokenCounter = 0;
-                foreach (string queryWord in disectedQuery)
+                }
+                else
                 {
-                    if (queryWord == "*not*") 
+                    incidenceVector.Add(token, new TermIndexer());
+                    incidenceVector[token].AddNewDocument(idOfDocument);
+                }
+            }
+            foreach (var value in incidenceVector.Values)
+            {
+                value.Calc_tfidf();
+            }
+            return tokens;
+        }
+
+        public List<int> PassQuery(string inputQuery)
+        {
+            List<string> disectedQuery = GenerateTokens(inputQuery, -1);
+            List<string> foundTokens = new List<string>();
+            List<DocumentInfo> blacklistedDocuments = new List<DocumentInfo>();
+            int queryTokenCounter = 0;
+            foreach (string queryWord in disectedQuery)
+            {
+                if (queryWord == "*not*")
+                {
+                    if (queryTokenCounter != disectedQuery.Count)
                     {
-                        if(queryTokenCounter != disectedQuery.Count)
-                        {
                         blacklistedDocuments.AddRange(incidenceVector[queryWord].Documents);
-                        }
                     }
-                    if (incidenceVector.ContainsKey(queryWord) && !foundTokens.Contains(queryWord))
+                }
+                if (incidenceVector.ContainsKey(queryWord) && !foundTokens.Contains(queryWord))
+                {
+                    foundTokens.Add(queryWord);
+                }
+                queryTokenCounter++;
+            }
+
+
+
+            List<int> foundPages = new List<int>();
+            foundPages.AddRange(CosineScoreCalculator(foundTokens, ORpageFinder(foundTokens)));
+            foundPages.AddRange(ANDpageFinder(foundTokens));
+            foundPages.AddRange(ORpageFinder(foundTokens));
+            foundPages = foundPages.Distinct().ToList();
+            foundPages.RemoveAll(e => blacklistedDocuments.Exists(bDoc => bDoc.DocumentID == e));
+
+            foundPages.ForEach(e => Console.WriteLine(e));
+
+            return foundPages;
+        }
+
+        public List<int> CosineScoreCalculator(List<string> queryTokens, List<int> pagesContainingQuery)
+        {
+            Dictionary<int, double> score = new Dictionary<int, double>();
+            foreach (int docID in pagesContainingQuery)
+            {
+                double tfStarExpSum = 0;
+                foreach (string qToken in queryTokens)
+                {
+                    DocumentInfo docInfo = incidenceVector[qToken].Documents.Find(e => e.DocumentID == docID);
+                    
+                    if(docInfo != null)
                     {
-                        foundTokens.Add(queryWord);
+                        tfStarExpSum += Math.Pow(docInfo.TermFrequencyStar, 2);
                     }
-                    queryTokenCounter++;
                 }
-
-                
-
-                List<int> foundPages = new List<int>();
-            foundpages.AddRange(CosineScoreCalculator());
-                foundPages.AddRange(ANDpageFinder(foundTokens));
-                foundPages.AddRange(ORpageFinder(foundTokens));
-                foundPages = foundPages.Distinct().ToList();
-                foundPages.RemoveAll(e => blacklistedDocuments.Exists(bDoc => bDoc.DocumentID == e));
-
-                foundPages.ForEach(e => Console.WriteLine(e));
-
-                return foundPages;
-            }
-
-
-            public List<int> ANDpageFinder(List<string> queryTokens)
-            {
-                List<int> commonIndexes = new List<int>();
-                List<int> firstDocIndexes = new List<int>(incidenceVector[queryTokens[0]].DocumentIDs());
-                if (queryTokens.Count > 1)
+                tfStarExpSum = Math.Sqrt(tfStarExpSum);
+                foreach (string qToken in queryTokens)
                 {
-                    commonIndexes = incidenceVector[queryTokens[1]].DocumentIDs().Intersect(firstDocIndexes).ToList();
-                    for (int i = 2; i < queryTokens.Count; i++)
+                    DocumentInfo docInfo = incidenceVector[qToken].Documents.Find(e => e.DocumentID == docID);
+
+                    if (docInfo != null)
                     {
-                        commonIndexes = incidenceVector[queryTokens[i]].DocumentIDs().Intersect(commonIndexes).ToList();
+                        docInfo.Normalised = docInfo.TermFrequencyStar / tfStarExpSum;
                     }
-                    return commonIndexes;
                 }
-                else return firstDocIndexes;
-
-            }
-
-
-
-            public List<int> ORpageFinder(List<string> queryTokens)
-            {
-                List<int> pageIndexes = new List<int>();
-                foreach (string queryToken in queryTokens)
+                double totalScore = 0;
+                foreach (string qToken in queryTokens)
                 {
-                    pageIndexes.AddRange(incidenceVector[queryToken].DocumentIDs());
+                    DocumentInfo docInfo = incidenceVector[qToken].Documents.Find(e => e.DocumentID == docID);
+                    DocumentInfo queryInfo = incidenceVector[qToken].Documents.Find(e => e.DocumentID == -1);
+                    
+                    if (docInfo != null && queryInfo != null)
+                    {
+                        totalScore += docInfo.Normalised * (queryInfo.TermFrequencyStar * incidenceVector[qToken].InverseDF);
+                    }
                 }
-                pageIndexes.Sort((x, y) =>
-                {
-                    if (pageIndexes.Count(e => e == x) < pageIndexes.Count(e => e == y)) return 1;
-                    else if (pageIndexes.Count(e => e == x) > pageIndexes.Count(e => e == y)) return -1;
-                    else return 0;
-                });
-
-                pageIndexes = pageIndexes.Distinct().ToList();
-
-                return pageIndexes;
-
+                score.Add(docID, totalScore);
             }
 
-
-            public string PorterStemming(string inputWord)
+             List<KeyValuePair<int,double>> resultingPagesSorted = score.ToList();
+             resultingPagesSorted.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
+             List<int> resultingPages = new List<int>();
+            foreach (KeyValuePair<int,double> kvPair in resultingPagesSorted)
             {
-                Regex ssPattern = new Regex("sses$");
-                Regex iesPattern = new Regex("ies");
-                Regex ationalPattern = new Regex("ational");
-                Regex tionalPattern = new Regex("tional");
-                ssPattern.Replace(inputWord, "ss");
-                iesPattern.Replace(inputWord, "i");
-                ationalPattern.Replace(inputWord, "ate");
-                tionalPattern.Replace(inputWord, "tion");
-
-                return inputWord;
-
+                resultingPages.Add(kvPair.Key);
             }
+            return resultingPages;
+
+        }
+
+
+        public List<int> ANDpageFinder(List<string> queryTokens)
+        {
+            List<int> commonIndexes = new List<int>();
+            List<int> firstDocIndexes = new List<int>(incidenceVector[queryTokens[0]].DocumentIDs());
+            if (queryTokens.Count > 1)
+            {
+                commonIndexes = incidenceVector[queryTokens[1]].DocumentIDs().Intersect(firstDocIndexes).ToList();
+                for (int i = 2; i < queryTokens.Count; i++)
+                {
+                    commonIndexes = incidenceVector[queryTokens[i]].DocumentIDs().Intersect(commonIndexes).ToList();
+                }
+                return commonIndexes;
+            }
+            else return firstDocIndexes;
+
+        }
+
+
+
+        public List<int> ORpageFinder(List<string> queryTokens)
+        {
+            List<int> pageIndexes = new List<int>();
+            foreach (string queryToken in queryTokens)
+            {
+                pageIndexes.AddRange(incidenceVector[queryToken].DocumentIDs());
+            }
+            pageIndexes.Sort((x, y) =>
+            {
+                if (pageIndexes.Count(e => e == x) < pageIndexes.Count(e => e == y)) return 1;
+                else if (pageIndexes.Count(e => e == x) > pageIndexes.Count(e => e == y)) return -1;
+                else return 0;
+            });
+
+            pageIndexes = pageIndexes.Distinct().ToList();
+
+            return pageIndexes;
+
+        }
+
+
+        public string PorterStemming(string inputWord)
+        {
+            Regex ssPattern = new Regex("sses$");
+            Regex iesPattern = new Regex("ies");
+            Regex ationalPattern = new Regex("ational");
+            Regex tionalPattern = new Regex("tional");
+            ssPattern.Replace(inputWord, "ss");
+            iesPattern.Replace(inputWord, "i");
+            ationalPattern.Replace(inputWord, "ate");
+            tionalPattern.Replace(inputWord, "tion");
+
+            return inputWord;
+
+        }
     }
 }
 

@@ -56,6 +56,7 @@
     <Compile Include="Restriction.cs" />
     <Compile Include="RobotTXTHandler.cs" />
     <Compile Include="Shingle.cs" />
+    <Compile Include="SurferRank.cs" />
     <Compile Include="TermIndexer.cs" />
     <Compile Include="Website.cs" />
   </ItemGroup>
