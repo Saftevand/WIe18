@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crawler.cs" />
+    <Compile Include="Document.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="HtmlRemoval.cs" />
     <Compile Include="NearDubDetector.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="Restriction.cs" />
     <Compile Include="RobotTXTHandler.cs" />
     <Compile Include="Shingle.cs" />
+    <Compile Include="DfWrapper.cs" />
     <Compile Include="Website.cs" />
   </ItemGroup>
   <ItemGroup>

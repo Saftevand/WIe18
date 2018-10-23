@@ -141,7 +141,7 @@ namespace NearDubDetect
                 knownwebsitees.Add(input1);
             }
 
-            if (knownwebsitees.Contains(input2))
+            if (knownwebsitees.Contains(input2) && input2.Hashnumber != null)
             {
                 shift2 = input2.Hashnumber;
             }

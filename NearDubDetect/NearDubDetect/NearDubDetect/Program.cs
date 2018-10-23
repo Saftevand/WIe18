@@ -15,9 +15,9 @@ namespace NearDubDetect
 
         static void testCrawler()
         {
-            Crawler crawler = new Crawler("https://www.heste-nettet.dk/");
+            Crawler crawler = new Crawler("https://heste-nettet.dk/");
             crawler.Crawl(100);
-            QueryTool queryMaster = new QueryTool();
+            QueryTool queryMaster = new QueryTool(crawler);
             int websiteCounter = 0;
             foreach (var item in crawler.websites)
             {
@@ -29,14 +29,17 @@ namespace NearDubDetect
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.Message);
                 }
             }
 
-            List<int> pageResults = queryMaster.PassQuery("Torsdag var voltigør Sheena Bendixen, Longefører Lasse Kristensen og hesten Klintholms Ramstein");
-            foreach (int index in pageResults)
+            
+
+            List<KeyValuePair<Document, double>> pageResults = queryMaster.PassQuery("Herning");
+            foreach (KeyValuePair<Document, double> doc in pageResults)
             {
-                Console.WriteLine(crawler.websites[index].currentPath);
+                Console.WriteLine(crawler.websites[doc.Key.Id].currentPath);
+                Console.WriteLine(doc.Value);
             }
 
             Console.WriteLine(crawler.websites.Count);

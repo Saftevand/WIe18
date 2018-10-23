@@ -91,7 +91,7 @@ namespace NearDubDetect
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.Message);
                 }
                 List<string> banned = new List<string>();
                 inputwebsite.HTMLContent = htmlDocument.Text;
@@ -108,6 +108,7 @@ namespace NearDubDetect
                 {
                     urls.Remove(item);
                 }
+
 
 
                 string url1;
@@ -151,22 +152,103 @@ namespace NearDubDetect
                         {
                             if (!queue.Contains(tempwebsite) && !websites.Contains(tempwebsite))
                             {
+                                tempwebsite.LinkedFrom.Add(inputwebsite);
                                 queue.Enqueue(tempwebsite);
+                            }
+                            else if(websites.Contains(tempwebsite))
+                            {
+                                websites.Find(x => x == tempwebsite).LinkedFrom.Add(inputwebsite);
+                            }
+                            else if (queue.Contains(tempwebsite))
+                            {
+                                queue.ElementAt(queue.ToArray().ToList().IndexOf(tempwebsite)).LinkedFrom.Add(inputwebsite);
                             }
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        //Console.WriteLine(e.Message);
                     }
                 }
             }
             catch (Exception e)
             {
 
-                Console.WriteLine(e.Message);
+                //Console.WriteLine(e.Message);
             }
 
+        }
+
+        public double[] PageRanker(double alpha, int HowMuchRanking)
+        {
+
+            int sizeOfMatrix = websites.Count;
+            double[ , ] transitionProbabilityMatrix = new double[sizeOfMatrix, sizeOfMatrix];
+
+            int[] countArray= new int[sizeOfMatrix];
+
+            // initializes matrix with 1s and 0s
+            for (int i = 0; i < sizeOfMatrix; i++)
+            {
+                for (int k = 0; k < sizeOfMatrix; k++)
+                {
+                    if(websites[k].LinkedFrom.Exists(x => x == websites[i]))
+                    {
+                        transitionProbabilityMatrix[i, k] = 1;
+                        countArray[i] += 1;
+                    }
+                    else
+                    {
+                        transitionProbabilityMatrix[i, k] = 0;
+                    }
+                }
+            }
+
+            // Calculates the fractions for each predecessor
+            for (int i = 0; i < sizeOfMatrix; i++)
+            {
+                for (int k = 0; k < sizeOfMatrix; k++)
+                {
+                    if (transitionProbabilityMatrix[i,k] == 1 && !(countArray[i] == 0))
+                    {
+                        transitionProbabilityMatrix[i, k] = Convert.ToDouble( 1) / Convert.ToDouble( countArray[i]);
+                    }
+                }
+            }
+
+            // initialize surfer
+            double[] surfer1 = new double[sizeOfMatrix];
+            Random rng = new Random();
+
+            surfer1[rng.Next(0, sizeOfMatrix - 1 )] = 10000;
+            
+
+            // init teleport
+            for (int i = 0; i < sizeOfMatrix; i++)
+            {
+                for (int k = 0; k < sizeOfMatrix; k++)
+                {
+                    transitionProbabilityMatrix[i, k] = ((1 - alpha) * transitionProbabilityMatrix[i,k]) + (alpha * (Convert.ToDouble( 1) / Convert.ToDouble( sizeOfMatrix)));
+                }
+            }
+
+            double val = 0;
+            // Do pageranking
+            for (int i = 0; i < HowMuchRanking; i++)
+            {
+                double[] surfer2 = new double[sizeOfMatrix];
+                for (int k = 0; k < sizeOfMatrix; k++)
+                {
+                    val = 0;
+                    for (int j = 0; j < sizeOfMatrix; j++)
+                    {
+                        val += surfer1[j] * transitionProbabilityMatrix[j, k];
+                    }
+                    surfer2[k] = val;
+                }
+                surfer1 = surfer2;
+            }
+            return surfer1;
         }
     }
 }

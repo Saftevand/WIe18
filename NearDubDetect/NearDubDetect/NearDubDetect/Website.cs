@@ -17,6 +17,7 @@ namespace NearDubDetect
         public string currentPath;
         public string HTMLContent;
         public List<int> Hashnumber;
+        public List<Website> LinkedFrom = new List<Website>();
 
         public override bool Equals(Object obj)
         {
